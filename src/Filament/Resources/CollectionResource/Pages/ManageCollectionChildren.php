@@ -64,7 +64,7 @@ class ManageCollectionChildren extends BaseManageRelatedRecords
                 ->label(
                     __('lunarpanel::collection.pages.children.table.name.label')
                 )
-                ->formatStateUsing(fn (Model $record): string => $record->attr('name')),
+                ->formatStateUsing(fn (Model $record): string => $record->titleLt),
             Tables\Columns\TextColumn::make('children_count')->counts('children')
                 ->label(
                     __('lunarpanel::collection.pages.children.table.children_count.label')
