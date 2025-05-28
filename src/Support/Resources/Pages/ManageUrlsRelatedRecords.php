@@ -68,24 +68,40 @@ class ManageUrlsRelatedRecords extends BaseManageRelatedRecords
             ]);
     }
 
+    
+    private function tableColumns(): array
+    {
+        $columns = [
+            Tables\Columns\TextColumn::make('slug')->label(
+                __('lunarpanel::relationmanagers.urls.table.slug.label')
+            ),
+            Tables\Columns\TextColumn::make('language.name')->label(
+                __('lunarpanel::relationmanagers.urls.table.language.label')
+            ),
+            Tables\Columns\IconColumn::make('default')
+                ->label(
+                    __('lunarpanel::relationmanagers.urls.table.default.label')
+                )
+                ->boolean(),
+        ];
+
+        if ($this->getOwnerRecord()->getMorphClass() == 'collection') {
+            array_unshift($columns , Tables\Columns\TextColumn::make('url')->label('URL')
+                ->copyable()
+                ->copyMessage('URL copied')
+                ->copyableState(fn ($record): string => $record->fullUrl())
+            );
+        }
+        
+        return $columns;
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
             ->modifyQueryUsing(fn (Builder $query) => $query->orderBy('language_id')->orderBy('default', 'desc'))
-            ->columns([
-                Tables\Columns\TextColumn::make('slug')->label(
-                    __('lunarpanel::relationmanagers.urls.table.slug.label')
-                ),
-                Tables\Columns\TextColumn::make('language.name')->label(
-                    __('lunarpanel::relationmanagers.urls.table.language.label')
-                ),
-                Tables\Columns\IconColumn::make('default')
-                    ->label(
-                        __('lunarpanel::relationmanagers.urls.table.default.label')
-                    )
-                    ->boolean(),
-            ])
+            ->columns($this->tableColumns())
             ->filters([
                 Tables\Filters\SelectFilter::make('language_id')
                     ->label(
