@@ -8,6 +8,7 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Collection;
 use Lunar\Models\Language;
+use Spatie\LaravelBlink\BlinkFacade as Blink;
 
 class TranslatedText extends TextInput
 {
@@ -45,7 +46,9 @@ class TranslatedText extends TextInput
     {
         parent::setUp();
 
-        $this->languages = Language::orderBy('default', 'desc')->get();
+        $this->languages = Blink::once('translated_text_languages', function () {
+            return Language::orderBy('default', 'desc')->get();
+        });
 
         $this->default(static function (TranslatedText $component): array {
             return $component->getLanguageDefaults();

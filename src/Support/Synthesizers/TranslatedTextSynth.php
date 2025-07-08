@@ -5,6 +5,7 @@ namespace Lunar\Admin\Support\Synthesizers;
 use Lunar\FieldTypes\Text;
 use Lunar\FieldTypes\TranslatedText;
 use Lunar\Models\Language;
+use Spatie\LaravelBlink\BlinkFacade as Blink;
 
 class TranslatedTextSynth extends AbstractFieldSynth
 {
@@ -14,7 +15,9 @@ class TranslatedTextSynth extends AbstractFieldSynth
 
     public function dehydrate($target)
     {
-        $languages = Language::orderBy('default', 'desc')->get();
+        $languages = Blink::once('translated_text_languages', function () {
+            return Language::orderBy('default', 'desc')->get();
+        });
 
         return [
             $languages->mapWithKeys(fn ($language) => [$language->code => new Text((string) $target->getValue()->get($language->code))]
